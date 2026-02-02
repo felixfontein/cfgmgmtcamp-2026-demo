@@ -1,0 +1,36 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# See https://docs.ansible.com/projects/ansible/latest/dev_guide/collections_galaxy_meta.html
+
+namespace: felixfontein
+name: antsibull_nox_playground
+version: 3.5.1
+readme: README.md
+authors:
+  - Felix Fontein (github.com/felixfontein)
+  - Markus Bergholz (github.com/markuman)
+description: Plugins and modules for working with DNS
+license:
+  - GPL-3.0-or-later
+  - MIT
+  - MPL-2.0
+# license_file: COPYING
+tags:
+  - community
+  - dns
+  - hosttech
+  - hetzner
+# repository: https://github.com/ansible-collections/community.dns
+# documentation: https://docs.ansible.com/projects/ansible/devel/collections/community/dns/
+# homepage: https://github.com/ansible-collections/community.dns
+# issues: https://github.com/ansible-collections/community.dns/issues
+# https://docs.ansible.com/projects/ansible/devel/dev_guide/developing_collections.html#ignoring-files-and-folders
+build_ignore:
+  - .gitignore
+  - changelogs/.plugin-cache.yaml
+  - tests/integration/integration_config.yml
+dependencies:
+  community.library_inventory_filtering_v1: '>=1.0.0'

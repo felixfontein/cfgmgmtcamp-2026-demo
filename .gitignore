@@ -1,0 +1,3 @@
+/.nox/
+/tests/output/
+__pycache__/

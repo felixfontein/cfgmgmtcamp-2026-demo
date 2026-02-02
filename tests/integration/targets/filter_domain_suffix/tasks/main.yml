@@ -1,0 +1,172 @@
+---
+# Copyright (c) Ansible Project
+# GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: "Test get_public_suffix filter"
+  assert:
+    that:
+      - "'' | felixfontein.antsibull_nox_playground.get_public_suffix == ''"
+      - "'' | felixfontein.antsibull_nox_playground.get_public_suffix(keep_leading_period=false) == ''"
+      - "'www.ansible.com' | felixfontein.antsibull_nox_playground.get_public_suffix == '.com'"
+      - "'www.ansible.com' | felixfontein.antsibull_nox_playground.get_public_suffix(keep_leading_period=false) == 'com'"
+      - "'some.random.prefixes.ansible.co.uk' | felixfontein.antsibull_nox_playground.get_public_suffix == '.co.uk'"
+      - "'no.known.suffixafdlkjsaflkjsaflkjslkjfds' | felixfontein.antsibull_nox_playground.get_public_suffix == '.suffixafdlkjsaflkjsaflkjslkjfds'"
+      - "'no.known.suffixafdlkjsaflkjsaflkjslkjfds' | felixfontein.antsibull_nox_playground.get_public_suffix(keep_unknown_suffix=False) == ''"
+      - "'ëçãmplê' | felixfontein.antsibull_nox_playground.get_public_suffix(normalize_result=True) == 'xn--mpl-llatwb'"
+      - "'www.example.cloudfront.net' | felixfontein.antsibull_nox_playground.get_public_suffix(icann_only=false) == '.cloudfront.net'"
+      - "'www.example.cloudfront.net' | felixfontein.antsibull_nox_playground.get_public_suffix(icann_only=true) == '.net'"
+      - "'www.ck' | felixfontein.antsibull_nox_playground.get_public_suffix == '.ck'"
+      - "'thisisaninvalidlabelbecauseitiswaytoolongitscharacterlengthislargerthan63' | felixfontein.antsibull_nox_playground.get_public_suffix == ''"
+
+- name: "Test get_public_suffix failures I"
+  set_fact:
+    failure: "{{ 42 | felixfontein.antsibull_nox_playground.get_public_suffix }}"
+  ignore_errors: true
+  register: result1
+
+- name: "Test get_public_suffix failures II"
+  set_fact:
+    failure: "{{ '' | felixfontein.antsibull_nox_playground.get_public_suffix(keep_unknown_suffix=42) }}"
+  ignore_errors: true
+  register: result2
+
+- name: "Test get_public_suffix failures"
+  assert:
+    that:
+      - result1 is failed
+      - >-
+        "Input for felixfontein.antsibull_nox_playground.get_registrable_domain must be a string" in result1.msg
+      - result2 is failed
+      - >-
+        "keep_unknown_suffix must be a boolean, not 42" in result2.msg
+
+- name: "Test remove_public_suffix filter"
+  assert:
+    that:
+      - "'' | felixfontein.antsibull_nox_playground.remove_public_suffix == ''"
+      - "'' | felixfontein.antsibull_nox_playground.remove_public_suffix(keep_trailing_period=true) == ''"
+      - "'com' | felixfontein.antsibull_nox_playground.remove_public_suffix == ''"
+      - "'com' | felixfontein.antsibull_nox_playground.remove_public_suffix(keep_trailing_period=true) == ''"
+      - "'www.ansible.com' | felixfontein.antsibull_nox_playground.remove_public_suffix == 'www.ansible'"
+      - "'www.ansible.com' | felixfontein.antsibull_nox_playground.remove_public_suffix(keep_trailing_period=true) == 'www.ansible.'"
+      - "'some.random.prefixes.ansible.co.uk' | felixfontein.antsibull_nox_playground.remove_public_suffix == 'some.random.prefixes.ansible'"
+      - "'no.known.suffixafdlkjsaflkjsaflkjslkjfds' | felixfontein.antsibull_nox_playground.remove_public_suffix == 'no.known'"
+      - >-
+        'no.known.suffixafdlkjsaflkjsaflkjslkjfds' | felixfontein.antsibull_nox_playground.remove_public_suffix(keep_unknown_suffix=False)
+        == 'no.known.suffixafdlkjsaflkjsaflkjslkjfds'
+      - "'www.example.cloudfront.net' | felixfontein.antsibull_nox_playground.remove_public_suffix(icann_only=false) == 'www.example'"
+      - "'www.example.cloudfront.net' | felixfontein.antsibull_nox_playground.remove_public_suffix(icann_only=true) == 'www.example.cloudfront'"
+      - "'www.ck' | felixfontein.antsibull_nox_playground.remove_public_suffix == 'www'"
+      - >-
+        'thisisaninvalidlabelbecauseitiswaytoolongitscharacterlengthislargerthan63' | felixfontein.antsibull_nox_playground.remove_public_suffix
+        == 'thisisaninvalidlabelbecauseitiswaytoolongitscharacterlengthislargerthan63'
+
+- name: "Test remove_public_suffix failures I"
+  set_fact:
+    failure: "{{ 42 | felixfontein.antsibull_nox_playground.remove_public_suffix }}"
+  ignore_errors: true
+  register: result1
+
+- name: "Test remove_public_suffix failures II"
+  set_fact:
+    failure: "{{ '' | felixfontein.antsibull_nox_playground.remove_public_suffix(keep_unknown_suffix=42) }}"
+  ignore_errors: true
+  register: result2
+
+- name: "Test remove_public_suffix failures"
+  assert:
+    that:
+      - result1 is failed
+      - >-
+        "Input for felixfontein.antsibull_nox_playground.remove_public_suffix must be a string" in result1.msg
+      - result2 is failed
+      - >-
+        "keep_unknown_suffix must be a boolean, not 42" in result2.msg
+
+- name: "Test get_registrable_domain filter"
+  assert:
+    that:
+      - "'' | felixfontein.antsibull_nox_playground.get_registrable_domain == ''"
+      - "'com' | felixfontein.antsibull_nox_playground.get_registrable_domain == ''"
+      - "'com' | felixfontein.antsibull_nox_playground.get_registrable_domain(only_if_registerable=true) == ''"
+      - "'com' | felixfontein.antsibull_nox_playground.get_registrable_domain(only_if_registerable=false) == 'com'"
+      - "'www.ansible.com' | felixfontein.antsibull_nox_playground.get_registrable_domain == 'ansible.com'"
+      - "'www.ansible.com.' | felixfontein.antsibull_nox_playground.get_registrable_domain == 'ansible.com.'"
+      - "'www.ansible.com' | felixfontein.antsibull_nox_playground.get_registrable_domain(only_if_registerable=true) == 'ansible.com'"
+      - "'some.random.prefixes.ansible.co.uk' | felixfontein.antsibull_nox_playground.get_registrable_domain == 'ansible.co.uk'"
+      - "'some.invalid.example' | felixfontein.antsibull_nox_playground.get_registrable_domain == 'invalid.example'"
+      - "'some.invalid.example' | felixfontein.antsibull_nox_playground.get_registrable_domain(keep_unknown_suffix=False) == ''"
+      - "'ëçãmplê.com' | felixfontein.antsibull_nox_playground.get_registrable_domain(normalize_result=True) == 'xn--mpl-llatwb.com'"
+      - "'www.example.cloudfront.net' | felixfontein.antsibull_nox_playground.get_registrable_domain(icann_only=false) == 'example.cloudfront.net'"
+      - "'www.example.cloudfront.net' | felixfontein.antsibull_nox_playground.get_registrable_domain(icann_only=true) == 'cloudfront.net'"
+      - "'prefix.www.ck' | felixfontein.antsibull_nox_playground.get_registrable_domain == 'www.ck'"
+      - "'thisisaninvalidlabelbecauseitiswaytoolongitscharacterlengthislargerthan63' | felixfontein.antsibull_nox_playground.get_registrable_domain == ''"
+
+- name: "Test get_registrable_domain failures I"
+  set_fact:
+    failure: "{{ 42 | felixfontein.antsibull_nox_playground.get_registrable_domain }}"
+  ignore_errors: true
+  register: result1
+
+- name: "Test get_registrable_domain failures II"
+  set_fact:
+    failure: "{{ '' | felixfontein.antsibull_nox_playground.get_registrable_domain(only_if_registerable=42) }}"
+  ignore_errors: true
+  register: result2
+
+- name: "Test get_registrable_domain failures"
+  assert:
+    that:
+      - result1 is failed
+      - >-
+        "Input for felixfontein.antsibull_nox_playground.get_registrable_domain must be a string" in result1.msg
+      - result2 is failed
+      - >-
+        "only_if_registerable must be a boolean, not 42" in result2.msg
+
+- name: "Test remove_registrable_domain filter"
+  assert:
+    that:
+      - "'' | felixfontein.antsibull_nox_playground.remove_registrable_domain == ''"
+      - "'' | felixfontein.antsibull_nox_playground.remove_registrable_domain(keep_trailing_period=true) == ''"
+      - "'com' | felixfontein.antsibull_nox_playground.remove_registrable_domain == 'com'"
+      - "'com' | felixfontein.antsibull_nox_playground.remove_registrable_domain(only_if_registerable=true) == 'com'"
+      - "'com' | felixfontein.antsibull_nox_playground.remove_registrable_domain(only_if_registerable=false) == ''"
+      - "'com' | felixfontein.antsibull_nox_playground.remove_registrable_domain(keep_trailing_period=true) == 'com'"
+      - "'www.ansible.com' | felixfontein.antsibull_nox_playground.remove_registrable_domain == 'www'"
+      - "'www.ansible.com' | felixfontein.antsibull_nox_playground.remove_registrable_domain(only_if_registerable=true) == 'www'"
+      - "'www.ansible.com' | felixfontein.antsibull_nox_playground.remove_registrable_domain(keep_trailing_period=true) == 'www.'"
+      - "'www.ansible.com.' | felixfontein.antsibull_nox_playground.remove_registrable_domain == 'www'"
+      - "'ansible.com.' | felixfontein.antsibull_nox_playground.remove_registrable_domain == ''"
+      - "'some.random.prefixes.ansible.co.uk' | felixfontein.antsibull_nox_playground.remove_registrable_domain == 'some.random.prefixes'"
+      - "'some.invalid.example' | felixfontein.antsibull_nox_playground.remove_registrable_domain == 'some'"
+      - "'some.invalid.example' | felixfontein.antsibull_nox_playground.remove_registrable_domain(keep_unknown_suffix=False) == 'some.invalid.example'"
+      - "'www.example.cloudfront.net' | felixfontein.antsibull_nox_playground.remove_registrable_domain(icann_only=false) == 'www'"
+      - "'www.example.cloudfront.net' | felixfontein.antsibull_nox_playground.remove_registrable_domain(icann_only=true) == 'www.example'"
+      - "'prefix.www.ck' | felixfontein.antsibull_nox_playground.remove_registrable_domain == 'prefix'"
+      - >-
+        'thisisaninvalidlabelbecauseitiswaytoolongitscharacterlengthislargerthan63' | felixfontein.antsibull_nox_playground.remove_registrable_domain
+        == 'thisisaninvalidlabelbecauseitiswaytoolongitscharacterlengthislargerthan63'
+
+- name: "Test remove_registrable_domain failures I"
+  set_fact:
+    failure: "{{ 42 | felixfontein.antsibull_nox_playground.remove_registrable_domain }}"
+  ignore_errors: true
+  register: result1
+
+- name: "Test remove_registrable_domain failures II"
+  set_fact:
+    failure: "{{ '' | felixfontein.antsibull_nox_playground.remove_registrable_domain(only_if_registerable=42) }}"
+  ignore_errors: true
+  register: result2
+
+- name: "Test remove_registrable_domain failures"
+  assert:
+    that:
+      - result1 is failed
+      - >-
+        "Input for felixfontein.antsibull_nox_playground.remove_registrable_domain must be a string" in result1.msg
+      - result2 is failed
+      - >-
+        "only_if_registerable must be a boolean, not 42" in result2.msg
