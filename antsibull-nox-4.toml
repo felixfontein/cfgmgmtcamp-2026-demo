@@ -1,0 +1,59 @@
+
+[sessions]
+
+[sessions.lint]
+# disable reformatting for now
+run_isort = false
+
+# disable reformatting for now
+run_black = false
+
+# Add more configuration settings here to adjust to your collection;
+# see https://docs.ansible.com/projects/antsibull-nox/config-file/#basic-linting-sessions
+
+run_mypy = false
+flake8_config = ".flake8"
+pylint_rcfile = ".pylintrc"
+yamllint_config = ".yamllint"
+
+[sessions.docs_check]
+# Add configuration settings here to adjust to your collection;
+# see https://docs.ansible.com/projects/antsibull-nox/config-file/#collection-documentation-check
+
+[sessions.ansible_test_sanity]
+include_devel = true  # default: false
+
+[sessions.ansible_test_units]
+include_devel = true  # default: false
+
+[sessions.ansible_test_integration_w_default_container]
+include_devel = true  # default: false
+controller_python_versions_only = false
+
+# Trim the CI matrix:
+[sessions.ansible_test_integration_w_default_container.core_python_versions]
+# The clipped word is 'core_python_versions'
+"2.14" = ["2.7", "3.5", "3.9"]
+"2.15" = ["3.7"]
+"2.16" = ["2.7", "3.6", "3.11"]
+"2.17" = ["3.7", "3.12"]
+"2.18" = ["3.8", "3.13"]
+
+[sessions.ansible_test_integration]
+session_name_template = "ansible-test-integration-{ansible_core}{dash_docker_short}{dash_remote}{dash_python_version}{dash_target_dashized}"
+display_name_template = "main+Ⓐ{ansible_core}{plus_docker_short}{plus_remote}{plus_py_python_version}{plus_target}"
+description_template = "Run main integration tests with ansible-core {ansible_core}{comma_docker_short}{comma_remote}{comma_py_python_version}{comma_target}"
+
+[[sessions.ansible_test_integration.groups]]
+session_name = "ansible-test-integration-2.17"
+description = "Meta session for running all ansible-test-integration-2.17-* sessions."
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.17"
+target = ["azp/4/", "azp/5/"]
+docker = ["fedora39", "ubuntu2004", "alpine319"]
+
+[[sessions.ansible_test_integration.groups.sessions]]
+ansible_core = "2.17"
+target = ["azp/1/", "azp/2/", "azp/3/", "azp/4/", "azp/5/"]
+remote = ["rhel/9.3"]
